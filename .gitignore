@@ -9,3 +9,6 @@ models/
 *.pkl
 *.joblib
 .env
+data/raw/
+data/processed/
+venv/
