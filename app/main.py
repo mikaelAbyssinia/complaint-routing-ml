@@ -3,7 +3,7 @@ import boto3
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from app.config import S3_BUCKET_NAME, DEPT_MODEL_S3_PREFIX, DEPT_MODEL_LOCAL_DIR, ALLOWED_ORIGINS, PRIORITY_MODEL_DIR
+from app.config import S3_BUCKET_NAME, DEPT_MODEL_S3_PREFIX, DEPT_MODEL_LOCAL_DIR, ALLOWED_ORIGINS
 from app.ml.predictor import load_models
 from app.routes import auth, complaints, pages
 from app.logger import get_logger
@@ -44,6 +44,7 @@ def download_folder_from_s3(bucket, prefix, local_dir):
 def startup():
     logger.info("Starting FinResolve Complaint Routing API")
 
+    # Department model — downloaded from S3 (too large for git)
     if model_exists(DEPT_MODEL_LOCAL_DIR):
         logger.info("Department model already cached, skipping S3 download")
     else:
@@ -51,13 +52,7 @@ def startup():
         download_folder_from_s3(S3_BUCKET_NAME, DEPT_MODEL_S3_PREFIX, DEPT_MODEL_LOCAL_DIR)
         logger.info("Department model downloaded successfully")
 
-    if model_exists(PRIORITY_MODEL_DIR):
-        logger.info("Priority model already cached, skipping S3 download")
-    else:
-        logger.info("Downloading priority model from S3...")
-        download_folder_from_s3(S3_BUCKET_NAME, "priority-model-bert", PRIORITY_MODEL_DIR)
-        logger.info("Priority model downloaded successfully")
-
+    # Priority model — LightGBM, loaded directly from git (models/priority-lgbm/)
     load_models()
     logger.info("API startup complete — ready to serve requests")
 
