@@ -25,15 +25,7 @@ The platform serves three distinct user roles: customers who submit complaints, 
 
 **Team**
 
-| Name | Role |
-|---|---|
-| Michael M. Demissie | Project Lead, ML Engineering, Backend & Frontend |
-| Blessing | Team Member |
-| Andy Gomez | Team Member |
-| Tony | Team Member |
-| Chidochashe | Team Member |
-| Tino | Team Member |
-| Ncee | Team Member |
+Michael M. Demissie, Blessing, Andy Gomez, Tony, Chidochashe, Tino, Ncee
 
 ---
 
