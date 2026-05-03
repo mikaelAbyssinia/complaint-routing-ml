@@ -1,0 +1,29 @@
+<svg width="500" height="130" viewBox="0 0 500 130" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>FinResolve Logo</title>
+  <desc>FinResolve brand logo with navy shield emblem and gold accent wordmark</desc>
+
+  <defs>
+    <clipPath id="shieldClip">
+      <path d="M8 6 L52 6 L52 72 Q52 104 30 116 Q8 104 8 72 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Shield body -->
+  <path d="M8 6 L52 6 L52 72 Q52 104 30 116 Q8 104 8 72 Z" fill="#0B2135"/>
+
+  <!-- Shield inner border -->
+  <path d="M14 12 L46 12 L46 70 Q46 96 30 107 Q14 96 14 70 Z" fill="none" stroke="#C9A84C" stroke-width="1.2" opacity="0.6"/>
+
+  <!-- F monogram -->
+  <text x="30" y="74" text-anchor="middle" font-family="Georgia, serif" font-size="48" font-weight="700" fill="#C9A84C" dominant-baseline="middle">F</text>
+
+  <!-- Wordmark -->
+  <text x="68" y="58" font-family="Georgia, serif" font-size="44" font-weight="600" fill="#0B2135">Fin</text>
+  <text x="148" y="58" font-family="Georgia, serif" font-size="44" font-weight="600" fill="#C9A84C">Resolve</text>
+
+  <!-- Tagline -->
+  <text x="68" y="84" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11.5" font-weight="400" fill="#0B2135" letter-spacing="2.8" opacity="0.5">FINANCIAL COMPLAINT RESOLUTION</text>
+
+  <!-- Gold rule -->
+  <line x1="68" y1="94" x2="488" y2="94" stroke="#C9A84C" stroke-width="0.8" opacity="0.4"/>
+</svg>

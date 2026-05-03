@@ -1,150 +1,171 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>FinResolve Staff Registration</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
-        
-        body {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;    
-            overflow: hidden;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(180deg, #f5f7fa, #eaf1f5);
-            background-color: #f5f7fa;
-        }
+{% extends "base.html" %}
 
-        .header {
-            padding-top:30px;
-            display: flex;
-            align-items: center;
-            height: 60px;
-            overflow: hidden;
-            padding-left: 20px;
-        }
+{% block title %}Staff Registration — FinResolve{% endblock %}
 
-        .header img {
-            height: 200px;
-            display: block;
-        }
+{% block extra_styles %}
+.auth-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    background: var(--gray-50);
+    min-height: calc(100vh - 200px);
+}
 
-        .separator {
-            height: 40px;
-            background-color: #0c3c52;
-            background: linear-gradient(90deg, #0c3c52, #145a7a);
-            width: 100%;
-        }
+.auth-box {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-xl);
+    padding: 48px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: var(--shadow-lg);
+    animation: fadeUp 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
 
-        .container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 40px;
-        }
-        
-        .form-box {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            width: 380px;
-        }
-        
-        .form-box h2 {
-            margin-top: 0;
-            color: #0c3c52;
-        }
-        
-        .form-box label {
-            display: block;
-            margin-top: 15px;
-        }
-        
-        .form-box input, .form-box select {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            box-sizing: border-box;
-        }
-        
-        .form-box button {
-            margin-top: 20px;
-            width: 100%;
-            padding: 10px;
-            border: none;
-            background-color: #0c3c52;
-            color: white;
-            cursor: pointer;
-        }
-        
-        .form-box button:hover {
-            background-color: #145a7a;
-        }
+.auth-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--navy-900), var(--gold-500), var(--navy-900));
+}
 
-        .checkbox-container {
-            margin-top: 15px;
-        }
+.auth-box-header { margin-bottom: 32px; }
+.auth-box-header h2 {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--navy-900);
+    margin-bottom: 6px;
+}
+.auth-box-header p { font-size: 14px; color: var(--gray-400); line-height: 1.6; }
 
-        footer {
-            background-color: #0c3c52;
-            color: white;
-            text-align: center;
-            padding: 30px;
-        }
-    </style>
+.auth-form { display: flex; flex-direction: column; gap: 20px; }
 
-    <script>
-        // ✅ Works locally + Render
-        const BASE_URL = window.location.origin;
-    </script>
+.role-toggle {
+    background: var(--gray-50);
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    transition: all var(--transition);
+}
 
-</head>
-<body>
+.role-toggle-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
 
-    <div class="header">
-        <a href="/staff-portal">
-            <img src="/static/logo.png" alt="FinResolve Logo">
-        </a>
-    </div>
+.role-toggle-header span {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--navy-900);
+}
 
-    <div class="separator"></div>
+.toggle-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+}
 
-    <div class="container">
-        <div class="form-box">
-            
-            <h2>Staff Registration</h2>
-            <p>
-                Register to access the FinResolve internal system. Authorized staff members can review, manage,
-                and process financial complaints based on their assigned roles and departments.
-            </p>
-    
-            <form id="registerForm">
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
 
-                <label>Name:</label>
-                <input type="text" id="name" required>
-            
-                <label>Email Address:</label>
-                <input type="email" id="email" required>
-            
-                <label>Password:</label>
-                <input type="password" id="password" required>
+.toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: var(--gray-200);
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all var(--transition);
+}
 
-                <div class="checkbox-container">
-                    <label>
-                        <input type="checkbox" id="reviewer" checked>
-                        Register as Reviewer
-                    </label>
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--white);
+    top: 3px; left: 3px;
+    transition: all var(--transition);
+    box-shadow: var(--shadow-sm);
+}
+
+.toggle-switch input:checked + .toggle-slider { background: var(--navy-700); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+.role-toggle-desc {
+    font-size: 12px;
+    color: var(--gray-400);
+    margin-top: 8px;
+}
+
+.error-msg {
+    padding: 12px 16px;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    color: var(--critical);
+    display: none;
+}
+
+.success-box { text-align: center; padding: 16px 0; }
+.success-icon {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--standard-bg);
+    color: var(--standard);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+}
+.success-box h3 { font-family: var(--font-display); font-size: 22px; color: var(--navy-900); margin-bottom: 8px; }
+.success-box p { font-size: 14px; color: var(--gray-400); }
+{% endblock %}
+
+{% block body %}
+<div class="auth-wrapper">
+    <div class="auth-box">
+        <div id="formContent">
+            <div class="auth-box-header">
+                <h2>Staff Registration</h2>
+                <p>Register to access the FinResolve internal system. Authorized staff only.</p>
+            </div>
+
+            <div class="error-msg" id="errorMsg"></div>
+
+            <form class="auth-form" id="registerForm">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="name" class="form-input" placeholder="Jane Smith" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-input" placeholder="jane@finresolve.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="Create a password" required>
                 </div>
 
-                <div id="departmentSection" style="display: none;">
-                    <label>Department:</label>
-                    <select id="department">
+                <div class="role-toggle">
+                    <label class="role-toggle-header">
+                        <span>Register as Reviewer</span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="reviewer" checked>
+                            <span class="toggle-slider"></span>
+                        </div>
+                    </label>
+                    <div class="role-toggle-desc" id="roleDesc">Reviewers manually handle low-confidence complaints.</div>
+                </div>
+
+                <div id="departmentSection" style="display:none;" class="form-group">
+                    <label class="form-label">Department</label>
+                    <select id="department" class="form-input">
                         <option value="">Select Department</option>
                         <option>Credit reporting</option>
                         <option>Debt collection</option>
@@ -157,85 +178,87 @@
                         <option>Payday / personal loans</option>
                     </select>
                 </div>
-            
-                <button type="submit">Register</button>
-            
+
+                <button type="submit" class="btn btn-navy btn-full btn-lg" id="submitBtn">Register</button>
             </form>
+
+            <div style="text-align:center;margin-top:20px;font-size:13px;color:var(--gray-400);">
+                Already have an account? <a href="/login" style="color:var(--navy-700);font-weight:500;text-decoration:none;">Sign in</a>
+            </div>
         </div>
     </div>
+</div>
+{% endblock %}
 
-    <footer>
-        <p><strong>FinResolve System</strong></p>
-        <p>Helping users resolve financial complaints efficiently and transparently.</p>
-        <p>Email: support@finresolve.com</p>
-        <p>&copy; 2026 FinResolve. All rights reserved.</p>
-    </footer>
+{% block scripts %}
+<script>
+const BASE_URL = window.location.origin;
 
-    <script>
+document.getElementById('name').addEventListener('blur', function() {
+    this.value = this.value.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+});
 
-        const nameInput = document.getElementById("name");
-        nameInput.addEventListener("blur", function () {
-            this.value = this.value
-                .toLowerCase()
-                .replace(/\b\w/g, char => char.toUpperCase());
+const reviewerToggle = document.getElementById('reviewer');
+const deptSection = document.getElementById('departmentSection');
+const roleDesc = document.getElementById('roleDesc');
+
+reviewerToggle.addEventListener('change', () => {
+    const isReviewer = reviewerToggle.checked;
+    deptSection.style.display = isReviewer ? 'none' : 'block';
+    roleDesc.textContent = isReviewer
+        ? 'Reviewers manually handle low-confidence complaints.'
+        : 'Operators manage complaints within their assigned department.';
+});
+
+document.getElementById('registerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const errMsg = document.getElementById('errorMsg');
+    btn.textContent = 'Registering…';
+    btn.disabled = true;
+    errMsg.style.display = 'none';
+
+    const isReviewer = reviewerToggle.checked;
+    const payload = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value,
+        reviewer: isReviewer
+    };
+    if (!isReviewer) payload.department = document.getElementById('department').value;
+
+    try {
+        const res = await fetch(`${BASE_URL}/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
-        
-        const reviewerCheckbox = document.getElementById("reviewer");
-        const departmentSection = document.getElementById("departmentSection");
-
-        reviewerCheckbox.addEventListener("change", () => {
-            departmentSection.style.display = reviewerCheckbox.checked ? "none" : "block";
-        });
-
-        document.getElementById("registerForm").addEventListener("submit", async function(e) {
-            e.preventDefault();
-
-            const isReviewer = reviewerCheckbox.checked;
-
-            const data = {
-                name: document.getElementById("name").value,
-                email: document.getElementById("email").value,
-                password: document.getElementById("password").value,
-                reviewer: isReviewer
-            };
-
-            if (!isReviewer) {
-                data.department = document.getElementById("department").value;
-            }
-
-            try {
-                const response = await fetch(`${BASE_URL}/register`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    document.querySelector(".form-box").innerHTML = `
-                        <div style="text-align: center;">
-                            <h2 style="color: green;">Your account has been successfully created.</h2>
-                            <p>You will be redirected to the login page shortly.</p>
-                        </div>
-                    `;
-
-                    setTimeout(() => {
-                        window.location.replace("/login");
-                    }, 3000);
-
-                } else {
-                    alert(result.detail || "An error occurred");
-                }
-
-            } catch (error) {
-                alert("Server error");
-                console.error(error);
-            }
-        });
-    </script>
-
-</body>
-</html>
+        const data = await res.json();
+        if (res.ok) {
+            document.getElementById('formContent').innerHTML = `
+                <div class="success-box">
+                    <div class="success-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                    <h3>Account Created!</h3>
+                    <p>Redirecting you to the login page…</p>
+                </div>
+            `;
+            setTimeout(() => window.location.replace('/login'), 2500);
+        } else {
+            errMsg.textContent = data.detail || 'An error occurred.';
+            errMsg.style.display = 'block';
+            btn.textContent = 'Register';
+            btn.disabled = false;
+        }
+    } catch {
+        errMsg.textContent = 'Unable to connect. Please try again.';
+        errMsg.style.display = 'block';
+        btn.textContent = 'Register';
+        btn.disabled = false;
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,8 @@
+<svg width="240" height="200" viewBox="0 0 240 200" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>FinResolve Logo</title>
+  <desc>FinResolve monogram logo — bold FR on navy background with gold accent</desc>
+  <rect x="10" y="10" width="220" height="180" fill="#0B2135" rx="3"/>
+  <rect x="10" y="10" width="7" height="180" fill="#C9A84C"/>
+  <text x="90" y="113" text-anchor="middle" font-family="Georgia, serif" font-size="110" font-weight="700" fill="#FFFFFF" dominant-baseline="middle">F</text>
+  <text x="175" y="113" text-anchor="middle" font-family="Georgia, serif" font-size="110" font-weight="700" fill="#C9A84C" dominant-baseline="middle">R</text>
+</svg>

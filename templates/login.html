@@ -1,205 +1,162 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>FinResolve Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
+{% extends "base.html" %}
 
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
-        
-        body {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;      
-            overflow: hidden;   
-            ffont-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(180deg, #f5f7fa, #eaf1f5);
-        }
+{% block title %}Sign In — FinResolve{% endblock %}
 
-        .header {
-            padding-top:30px;
-            display: flex;
-            align-items: center;
-            height: 60px;   
-            overflow: hidden;
-        }
-
-        .header img {
-            height: 200px;        
-            display: block;       
-        }
-
-        .separator {
-            height: 40px;                  
-            background-color: #0c3c52;    
-            background: linear-gradient(90deg, #0c3c52, #145a7a);
-            width: 100%;
-            flex-shrink: 0;
-        }
-        
-       .container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 40px;
-        }
-        
-        .form-box {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            width: 350px;
-        }
-        
-        .form-box h2 {
-            margin-top: 0;
-            color: #0c3c52;
-        }
-        
-        .form-box label {
-            display: block;
-            margin-top: 15px;
-        }
-        
-        .form-box input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            box-sizing: border-box;
-        }
-        
-        .form-box button {
-            margin-top: 20px;
-            width: 100%;
-            padding: 10px;
-            border: none;
-            background-color: #0c3c52;
-            color: white;
-            cursor: pointer;
-        }
-        
-        .form-box button:hover {
-            background-color: #145a7a;
-        }
-
-        footer {
-            background-color: #0c3c52;
-            color: white;
-            text-align: center;
-            padding: 30px;
-            margin-top: 0;
-            flex-shrink: 0;
-        }
-    </style>
-
-    <script>
-        // ✅ Works locally + on Render
-        const BASE_URL = window.location.origin;
-    </script>
-
-</head>
-<body>
-
-    <div class="header">
-        <a href="">
-            <img src="/static/logo.png" alt="Logo">
-        </a>
-    </div>
-
-    <div class='separator'></div>
-
-    <div class="container">
-        <div class="form-box">
-            
-            <h2>Login</h2>
-            <p>To log in, please enter your email address and password.</p>
-    
-            <form>
-    
-                <label>Email:</label>
-                <input type="email" id="email" required>
-    
-                <label>Password:</label>
-                <input type="password" id="password" required>
-    
-                <button type="submit">Login</button>
-    
-            </form>
-    
-        </div>
-    </div>
-
-    <footer>
-        <p><strong>FinResolve System</strong></p>
-        <p>Helping users resolve financial complaints efficiently and transparently.</p>
-        <p>Email: support@finresolve.com</p>
-        <p>&copy; 2026 FinResolve. All rights reserved.</p>
-    </footer>
-
-<script>
-    
-function parseJwt(token) {
-    const base64Url = token.split('.')[1];
-    const base64 = atob(base64Url);
-    return JSON.parse(base64);
+{% block extra_styles %}
+.auth-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    background: var(--gray-50);
+    min-height: calc(100vh - 200px);
 }
 
-document.querySelector("form").addEventListener("submit", async function(e) {
-    e.preventDefault();
+.auth-box {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-xl);
+    padding: 48px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--shadow-lg);
+    animation: fadeUp 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
 
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+.auth-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--navy-900), var(--gold-500), var(--navy-900));
+}
+
+.auth-box-header {
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.auth-box-header h2 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--navy-900);
+    margin-bottom: 8px;
+}
+
+.auth-box-header p {
+    font-size: 14px;
+    color: var(--gray-400);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.auth-footer-link {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 13px;
+    color: var(--gray-400);
+}
+
+.auth-footer-link a {
+    color: var(--navy-700);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.auth-footer-link a:hover { color: var(--gold-500); }
+
+.error-msg {
+    padding: 12px 16px;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    color: var(--critical);
+    display: none;
+}
+{% endblock %}
+
+{% block body %}
+<div class="auth-wrapper">
+    <div class="auth-box">
+        <div class="auth-box-header">
+            <h2>Welcome Back</h2>
+            <p>Sign in to your FinResolve account</p>
+        </div>
+
+        <div class="error-msg" id="errorMsg"></div>
+
+        <form class="auth-form" id="loginForm">
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" id="email" class="form-input" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-navy btn-full btn-lg" id="submitBtn">
+                Sign In
+            </button>
+        </form>
+
+        <div class="auth-footer-link">
+            Don't have an account? <a href="/customer-registration">Create one</a>
+        </div>
+        <div class="auth-footer-link" style="margin-top: 8px;">
+            Staff member? <a href="/staff-portal">Staff Portal →</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const errMsg = document.getElementById('errorMsg');
+    btn.textContent = 'Signing in…';
+    btn.disabled = true;
+    errMsg.style.display = 'none';
 
     try {
-        const response = await fetch(`${BASE_URL}/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+        const res = await fetch(`${BASE_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                email: email,
-                password: password
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
             })
         });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            const token = data.access_token;
-
-            // store token
-            localStorage.setItem("token", token);
-
-            // decode token
-            const decoded = parseJwt(token);
-            const role = decoded.role;
-
-            // redirect based on role
-            if (role === "customer") {
-                window.location.href = "/customer-dashboard";
-            } 
-            else if (role === "operator") {
-                window.location.href = "/operator-dashboard";
-            } 
-            else if (role === "reviewer") {
-                window.location.href = "/reviewer-dashboard";
-            }
-
+        const data = await res.json();
+        if (res.ok) {
+            localStorage.setItem('token', data.access_token);
+            const decoded = parseJwt(data.access_token);
+            const role = decoded?.role;
+            if (role === 'customer') window.location.href = '/customer-dashboard';
+            else if (role === 'operator') window.location.href = '/operator-dashboard';
+            else if (role === 'reviewer') window.location.href = '/reviewer-dashboard';
         } else {
-            alert(data.detail);
+            errMsg.textContent = data.detail || 'Invalid email or password.';
+            errMsg.style.display = 'block';
+            btn.textContent = 'Sign In';
+            btn.disabled = false;
         }
-
-    } catch (error) {
-        alert("Error connecting to server");
-        console.error(error);
+    } catch {
+        errMsg.textContent = 'Unable to connect. Please try again.';
+        errMsg.style.display = 'block';
+        btn.textContent = 'Sign In';
+        btn.disabled = false;
     }
 });
 </script>
-    
-</body>
-</html>
+{% endblock %}
