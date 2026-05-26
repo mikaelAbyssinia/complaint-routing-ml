@@ -14,21 +14,6 @@ The platform serves three distinct user roles: customers who submit complaints, 
 
 ---
 
-## Academic Context
-
-| | |
-|---|---|
-| **Institution** | George Washington University |
-| **Course** | Applied Machine Learning for Analytics — EMSE 6575 |
-| **Instructor** | Prof. Maksim Tsvetovat |
-| **Term** | Spring 2026 |
-
-**Team**
-
-Michael M. Demissie, Blessing, Andy Gomez, Tony, Chidochashe, Tino, Ncee
-
----
-
 ## System Architecture
 
 ```
@@ -67,6 +52,35 @@ Operator Dashboard  Reviewer Queue
 
 ---
 
+## Data Pipeline
+
+The models were trained on 1M+ real financial complaint records from the CFPB Consumer Complaint Database.
+
+**ETL process:**
+
+1. **Extraction** — Downloaded raw complaint records from the CFPB public dataset in CSV format
+2. **Validation** — Filtered to complaints with consumer narratives, removed duplicates, stripped CFPB-style masking tokens (`XXXX`)
+3. **Transformation** — Cleaned and normalized complaint text, mapped product categories to 9 department labels
+4. **Label Engineering** — Built a domain-specific priority scoring system for each department incorporating signals such as fraud keywords, legal references, financial amounts, harassment indicators, and persistence signals — programmatically generating and classifying 812K training samples across 9 departments
+5. **Loading** — Structured data saved to parquet and CSV splits for model training
+
+**Training data breakdown:**
+
+| Split | Samples |
+|---|---|
+| Training | 812,720 |
+| Test | 203,180 |
+| **Total** | **1,015,900** |
+
+**Models trained in parallel:**
+
+- **DistilBERT** — fine-tuned on department routing across 9 classes
+- **LightGBM** — trained on TF-IDF features for priority classification
+
+Both models run at inference time with confidence thresholds. When either model falls below the threshold, the complaint is automatically escalated to the reviewer dashboard for human triage.
+
+---
+
 ## Machine Learning Models
 
 ### Department Classifier — DistilBERT
@@ -89,7 +103,7 @@ The model is hosted on AWS S3 and downloaded to the server at startup. It achiev
 
 ### Priority Classifier — TF-IDF + LightGBM
 
-A TF-IDF vectorizer (50,000 features, unigrams + bigrams) paired with a LightGBM gradient boosting classifier. Priority labels were engineered using a domain-specific rule-based scoring system developed for each department — incorporating signals such as fraud keywords, legal references, financial amounts, harassment indicators, and persistence signals.
+A TF-IDF vectorizer (50,000 features, unigrams + bigrams) paired with a LightGBM gradient boosting classifier. Priority labels were engineered using a domain-specific rule-based scoring system developed for each department.
 
 | Priority | Description | Target Resolution |
 |---|---|---|
@@ -97,7 +111,7 @@ A TF-IDF vectorizer (50,000 features, unigrams + bigrams) paired with a LightGBM
 | High Priority | Disputed accounts, harassment, credit damage | 3–4 business days |
 | Standard | Routine disputes, billing inquiries | 5–6 business days |
 
-**Model Performance on held-out test set (203,180 samples):**
+**Model performance on held-out test set (203,180 samples):**
 
 | Class | Precision | Recall | F1 |
 |---|---|---|---|
@@ -105,20 +119,6 @@ A TF-IDF vectorizer (50,000 features, unigrams + bigrams) paired with a LightGBM
 | High Priority | 0.82 | 0.84 | 0.83 |
 | Standard | 0.93 | 0.91 | 0.92 |
 | **Overall Accuracy** | | | **0.88** |
-
----
-
-## Dataset
-
-**Source:** [Consumer Financial Protection Bureau (CFPB) Complaint Database](https://www.consumerfinance.gov/data-research/consumer-complaints/)
-
-| Split | Samples |
-|---|---|
-| Training | 812,720 |
-| Test | 203,180 |
-| **Total** | **1,015,900** |
-
-The dataset was filtered to include only complaints with a consumer narrative, deduplicated, cleaned of CFPB-style masking tokens (`XXXX`), and labeled using domain-specific priority scoring functions before model training.
 
 ---
 
@@ -135,6 +135,29 @@ The dataset was filtered to include only complaints with a consumer narrative, d
 | **Frontend** | Jinja2 templates, vanilla JS |
 | **Deployment** | Render |
 | **Language** | Python 3.11 |
+
+---
+
+## User Roles
+
+**Customer** — submits complaints through the portal and tracks resolution status.
+
+**Operator** — views complaints routed to their department, organized by priority level (critical, high priority, standard) with AI confidence scores.
+
+**Reviewer** — handles complaints where the model confidence fell below the threshold for either department or priority, requiring human judgment before routing.
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/register` | None | Register a new user |
+| `POST` | `/login` | None | Authenticate and receive JWT |
+| `POST` | `/submit-complaint` | Customer | Submit a complaint for AI routing |
+| `GET` | `/my-complaints` | Customer | Retrieve personal complaint history |
+| `GET` | `/operator-complaints` | Operator | Get department complaint queue |
+| `GET` | `/reviewer-complaints` | Reviewer | Get low-confidence complaint queue |
 
 ---
 
@@ -181,53 +204,23 @@ complaint-routing-ml/
 
 ---
 
-## API Endpoints
-
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| `POST` | `/register` | None | Register a new user |
-| `POST` | `/login` | None | Authenticate and receive JWT |
-| `POST` | `/submit-complaint` | Customer | Submit a complaint for AI routing |
-| `GET` | `/my-complaints` | Customer | Retrieve personal complaint history |
-| `GET` | `/operator-complaints` | Operator | Get department complaint queue |
-| `GET` | `/reviewer-complaints` | Reviewer | Get low-confidence complaint queue |
-
----
-
-## User Roles
-
-**Customer** — submits complaints through the portal and tracks resolution status.
-
-**Operator** — views complaints routed to their department, organized by priority level (critical, high priority, standard) with AI confidence scores.
-
-**Reviewer** — handles complaints where the model confidence fell below the threshold for either department or priority, requiring human judgment before routing.
-
----
-
 ## Local Development
 
 **Prerequisites:** Python 3.11, PostgreSQL, AWS credentials (for department model S3 download)
 
 ```bash
-# Clone the repository
 git clone https://github.com/michael-demissie/complaint-routing-ml.git
 cd complaint-routing-ml
 
-# Create and activate virtual environment
 python3 -m venv venv
 source venv/bin/activate
 
-# Install dependencies
 pip install -r requirements.txt
 
-# Set up environment variables
 cp .env.example .env
-# Edit .env with your DATABASE_URL, AWS credentials, SECRET_KEY
 
-# Create database tables
 python3 app/db_setup.py
 
-# Start the development server
 uvicorn app.main:app --reload
 ```
 
@@ -239,14 +232,14 @@ The app will be available at `http://127.0.0.1:8000`.
 
 | Variable | Description |
 |---|---|
-| `SECRET_KEY` | JWT signing key (generate with `secrets.token_hex(32)`) |
+| `SECRET_KEY` | JWT signing key |
 | `DATABASE_URL` | PostgreSQL connection string |
 | `AWS_ACCESS_KEY_ID` | AWS credentials for S3 model download |
 | `AWS_SECRET_ACCESS_KEY` | AWS credentials for S3 model download |
 | `AWS_REGION` | AWS region (e.g. `us-east-1`) |
 | `S3_BUCKET_NAME` | S3 bucket containing the department model |
 | `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins |
-| `CONFIDENCE_THRESHOLD` | Minimum confidence score before flagging for review (default: `0.5`) |
+| `CONFIDENCE_THRESHOLD` | Minimum confidence before flagging for review (default: `0.5`) |
 
 ---
 
@@ -256,6 +249,8 @@ The application is deployed on **Render** with a **Neon** serverless PostgreSQL 
 
 ---
 
-## Acknowledgements
+## Author
 
-This project was developed as part of the Applied Machine Learning for Analytics course (EMSE 6575) at the George Washington University under the supervision of Prof. Maksim Tsvetovat. The complaint data is sourced from the publicly available CFPB Consumer Complaint Database.
+**Michael Mulugeta Demissie**
+Data Engineer | MS Data Analytics @ George Washington University
+[LinkedIn](https://www.linkedin.com/in/michael-mulugeta-demissie-3a7b753b3) · [GitHub](https://github.com/michael-demissie)
